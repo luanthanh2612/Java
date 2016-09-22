@@ -1,0 +1,214 @@
+#include<stdio.h>
+#include<iostream>
+#include<time.h>
+#include<conio.h>
+using namespace std;
+
+typedef struct ThiSinh{
+	int MATS;
+	char HoTen[30];
+	bool ketQua;
+	float Diem1, Diem2, Diem3;
+};
+
+typedef struct Node
+					{
+						ThiSinh data;
+					struct Node * pNext;}  ;
+
+typedef struct List{Node *pHead;
+					Node *pTail;};
+
+void TaoList(List &l)
+{
+	l.pHead=NULL;
+	l.pTail=NULL;
+}
+
+  List l;
+  int n;  
+//Nhap xau
+//1. Tao node
+Node* GetNode(ThiSinh dulieu)
+{
+Node *p=new Node;
+if(p==NULL) return NULL;
+p->data=dulieu;
+p->pNext=NULL;
+return p;
+}
+
+void AddCuoiXau(List &l, Node *p)
+{
+if(l.pHead==NULL) {
+l.pHead=l.pTail=p;}
+else {
+	l.pTail->pNext=p;
+	l.pTail=p;
+}
+}
+
+void nhapxau (List &l)  
+{ printf("Nhap so phan tu cua xau: ");  
+  scanf("%d", &n);  
+  ThiSinh ts;
+  Node * p;
+  float diemTB;
+  for (int i=1; i<=n; i++)  
+    {  
+      printf("Nhap thong tin thi sinh thu %5d \n",i);  
+       printf("Nhap Ma so thi sinh \n");  scanf(" %d", &ts.MATS);  
+       printf("Nhap Ho ten thi sinh \n");   scanf(" %s", &ts.HoTen); 
+	    printf("Nhap Diem thi mon thu 1 \n ");   scanf(" %f", &ts.Diem1);  
+	     printf("Nhap Diem thi mon thu 2 \n");scanf(" %f", &ts.Diem2); 
+	     printf("Nhap Diem thi mon thu 3 \n"); scanf(" %f", &ts.Diem3);
+		 diemTB  = (ts.Diem1 *2 + ts.Diem2 + ts.Diem3)/4;
+		 if(diemTB >= 5.0){
+			 ts.ketQua = true;
+		 }else{
+			 ts.ketQua = false;
+		 }
+      p=GetNode(ts);
+      if(p==NULL)break;
+      else
+      {
+      	AddCuoiXau(l,p);
+      }
+    }  
+}    
+
+void xuatxau (List l)  
+{  
+  Node *p=l.pHead;
+  
+  printf("Thong tin thi sinh  \n");
+  while(p!=NULL)  {  	
+  	printf("%d   ",p->data.MATS);
+  	printf("%s   ",p->data.HoTen);
+  	printf("%f   ",p->data.Diem1);
+  	printf("%f   ",p->data.Diem2);
+  	printf("%f   ",p->data.Diem3);
+	if(p->data.ketQua){
+		printf("Dat");
+	}else{
+		printf("Khong dat");
+	}
+  	printf("\n");
+  	p=p->pNext;
+  }
+}    
+
+
+void TimX(List l)
+{
+	int x;
+	printf("Nhap phan tu can tim : ");
+	scanf("%d", &x);
+	Node *p=l.pHead;
+	while(p!=NULL)
+  {
+	  if(p->data.MATS == x) 
+	  {
+	  printf("Tim thay %d ",x) ;
+	  printf("\n");
+	  return; }
+	  p=p->pNext;
+  }
+  printf("Khong tim thay %d",x);
+   printf("\n");
+}
+void RemoveX(List &l)
+{	Node *p,*q; q = NULL; p=l.pHead;
+	int x;
+	printf("Nhap phan tu can tim va huy : ");
+	scanf("  %d",&x);
+	while((p!=NULL)&&(p->data.MATS!=x)) //tìm
+	{	q=p;
+		p=p->pNext;
+	}
+	if(p==NULL) //không tìm th?y ph?n t? có khoá b?ng x
+		{
+		printf("Khong tim thay %d \n",x);
+		return ;}
+	if(q!=NULL) //tìm th?y ph?n t? có khoá b?ng x
+		{		if(p==l.pTail)
+				l.pTail =q; //c?p nh?t l?i pTail
+				q->pNext=p->pNext;
+				delete p;	 }
+	else //phan tu can xoa nam dau List 
+		{		l.pHead=p->pNext;
+				if(l.pHead==NULL)
+					l.pTail=NULL; }
+	 	}
+void AddHead(List &l, Node *p)
+{
+	if(l.pTail==NULL)
+	{
+		l.pTail=l.pHead=p;
+	}
+	else{
+	p->pNext=l.pHead;
+	l.pHead=p;
+	}
+}
+void QuickSort(List &l)
+{	
+	Node *p,*X;//X luu d?a ch? c?a ph?n t? c?m canh
+	List l1,l2;
+	if(l.pHead==l.pTail) return;//dã có th? t?
+	TaoList(l1);
+	TaoList(l2);
+	
+	X=l.pHead;
+	l.pHead=X->pNext;
+	while(l.pHead!=NULL)//tách L = L1 va L2
+	{	p=l.pHead;
+		l.pHead=p->pNext;
+		p->pNext=NULL;
+		if(p->data.MATS<=X->data.MATS)
+			AddHead(l1,p);
+		else
+			AddHead(l2,p);
+	}
+	QuickSort(l1);//G?i d? quy s?p x?p L1
+	QuickSort(l2);//G?i d? quy s?p x?p L2
+	if(l1.pHead!=NULL)//n?i l1, l2 va X vao l
+	{
+		l.pHead=l1.pHead;
+		l1.pTail->pNext=X;//n?i X vào
+	}
+	else
+		l.pHead=X;
+	X->pNext=l2.pHead;
+	if(l2.pHead!=NULL) //l2 có trên m?t ph?n t?
+		l.pTail=l2.pTail;
+	else  //l2 không có ph?n t? nào 
+		l.pTail=X;
+}
+void RemoveList(List &l)
+	{	
+		Node *p;
+		while(l.pHead!=NULL) //còn ph?n t? trong List
+		{
+			p = l.pHead;
+			l.pHead = p->pNext;
+			delete p;
+		}
+	} 
+
+ void main(){
+
+	 TaoList(l);
+	 nhapxau(l);
+		
+	 QuickSort(l);
+	 TimX(l);
+	  RemoveX(l);
+	  xuatxau(l);
+
+	  RemoveList(l);
+	 
+
+	
+	 system("PAUSE");
+ }
